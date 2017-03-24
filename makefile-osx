@@ -1,0 +1,20 @@
+CC=clang
+
+all: main libs
+
+main:
+	$(CC) -rdynamic -ldl -o main main.c
+
+libs: goodlib badlib
+
+goodlib:
+	$(CC) -Wall -fPIC -c printer.c
+	$(CC) -shared -Wl,-soname,libprtr.so.1 -o libprtr.so.1.0 printer.o
+
+badlib:
+	$(CC) -Wall -fPIC -c bad_printer.c
+	$(CC) -shared -Wl,-soname,libbadprtr.so.1 -o libbadprtr.so.1.0 bad_printer.o
+
+clean:
+	rm *.o
+	rm lib*
