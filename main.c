@@ -12,17 +12,14 @@ static const char* LIBNAME  = "./libPrinter.dylib";
 static const char* FUNAME   = "print";
 
 static int load_file(void) {
-    void *handle            = NULL;
-    void (*printer)(void)   = NULL;
-    int result              = 0;
-
-    handle = dlopen(LIBNAME, RTLD_LAZY);
+    void* handle = dlopen(LIBNAME, RTLD_LAZY);
 
     if (handle == NULL) {
         printf("Error opening library: %s\n", dlerror());
         return FAIL;
     }
 
+    void (*printer)(void) = NULL;
     *(void **) (&printer) = dlsym(handle, FUNAME);
 
     if (printer == NULL) {
@@ -40,25 +37,22 @@ static int load_file(void) {
 }
 
 static int load_mem(void) {
-    void *handle                = NULL;
-    void (*printer)(void)       = NULL;
-    int result                  = 0;
     static const char* FNAME    = "/tmp/libExtract.dylib";
 
     FILE* new_lib = fopen(FNAME, "w");
-    printf("%lu\n", sizeof(libPrinter_dylib));
     for(unsigned int i = 0; i < sizeof(libPrinter_dylib); i++) {
         fprintf(new_lib, "%c", libPrinter_dylib[i]);
     }
     fclose(new_lib);
 
-    handle = dlopen(FNAME, RTLD_LAZY);
+    void* handle = dlopen(FNAME, RTLD_LAZY);
 
     if (handle == NULL) {
         printf("Error opening library: %s\n", dlerror());
         return FAIL;
     }
 
+    void (*printer)(void) = NULL;
     *(void **) (&printer) = dlsym(handle, FUNAME);
 
     if (printer == NULL) {
