@@ -1,6 +1,10 @@
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/syslimits.h>
 
 #include "libPrinter.h"
 
@@ -10,9 +14,10 @@ typedef enum {
 
 static const char* LIBNAME  = "./libPrinter.dylib";
 static const char* FUNAME   = "print";
+static const char* FNAME    = "./libExtract.dylib";
 
-static int load_file(void) {
-    void* handle = dlopen(LIBNAME, RTLD_LAZY);
+static int _load_and_run(const char* name) {
+    void* handle = dlopen(name, RTLD_LAZY);
 
     if (handle == NULL) {
         printf("Error opening library: %s\n", dlerror());
@@ -32,45 +37,23 @@ static int load_file(void) {
         printf("Error closing library: %s\n", dlerror());
         return FAIL;
     }
-    
+
+    remove(name);
+
     return OK;
 }
 
-static int load_mem(void) {
-    static const char* FNAME    = "/tmp/libExtract.dylib";
+static int _load_file(void) {
+    return _load_and_run(LIBNAME);
+}
 
-    FILE* new_lib = fopen(FNAME, "w");
-    for(unsigned int i = 0; i < sizeof(libPrinter_dylib); i++) {
-        fprintf(new_lib, "%c", libPrinter_dylib[i]);
-    }
-    fclose(new_lib);
-
-    void* handle = dlopen(FNAME, RTLD_LAZY);
-
-    if (handle == NULL) {
-        printf("Error opening library: %s\n", dlerror());
-        return FAIL;
-    }
-
-    void (*printer)(void) = NULL;
-    *(void **) (&printer) = dlsym(handle, FUNAME);
-
-    if (printer == NULL) {
-        printf("Error opening function: %s\n", dlerror());        
-        return FAIL;
-    }
-
-    (*printer)();
-    if (dlclose(handle)) {
-        printf("Error closing library: %s\n", dlerror());
-        return FAIL;
-    }
-
-    remove(FNAME);
-
-    return OK;
+static int _load_write(void) {
+    int new_lib = open(FNAME, O_CREAT | O_WRONLY);
+    write(new_lib, libPrinter_dylib, sizeof(libPrinter_dylib));
+    close(new_lib);
+    return _load_and_run(FNAME);
 }
 
 int main(void) {
-    return load_mem();
+    return _load_write();
 }
