@@ -2,15 +2,15 @@ CC=clang
 
 all: main libs
 
-main:
+main: main.c
 	$(CC) -o main main.c
 
 libs: goodlib badlib
 
-goodlib:
+goodlib: printer.c
 	$(CC) -Wall -dynamiclib -o libPrinter.dylib printer.c
 
-badlib:
+badlib: bad_printer.c
 	$(CC) -Wall -dynamiclib -o libBadPrinter.dylib bad_printer.c
 
 clean:
