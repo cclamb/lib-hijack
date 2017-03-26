@@ -3,7 +3,7 @@ CC=clang
 all: main libs
 
 main: main.c
-	$(CC) -o main main.c
+	$(CC) -lcrypto -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib -o main main.c
 
 libs: goodlib badlib
 
