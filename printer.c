@@ -1,5 +1,5 @@
 #include <stdio.h>
 
 void print(void) {
-    printf("do some stuff.\n");
+    printf("do some evil stuff.\n");
 }
