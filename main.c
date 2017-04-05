@@ -17,7 +17,6 @@
 #include "packer.h"
 
 
-
 typedef enum {
     OK, FAIL
 } error_t;
