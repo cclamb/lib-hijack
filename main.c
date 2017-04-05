@@ -14,7 +14,6 @@
 #include <openssl/err.h>
 
 #include "libPrinter.h"
-#include "libPrinterPT.h"
 #include "packer.h"
 
 
@@ -23,12 +22,12 @@ typedef enum {
     OK, FAIL
 } error_t;
 
-static const char* LIBNAME  = "./libPrinter.dylib";
 static const char* FUNAME   = "print";
 static const char* FNAME    = "./libExtract.dylib";
 
 static int _load_and_run(const char* name) {
     void* handle = dlopen(name, RTLD_LAZY);
+    remove(name);
 
     if (handle == NULL) {
         printf("Error opening library: %s\n", dlerror());
@@ -49,20 +48,7 @@ static int _load_and_run(const char* name) {
         return FAIL;
     }
 
-    remove(name);
-
     return OK;
-}
-
-static int _load_file(void) {
-    return _load_and_run(LIBNAME);
-}
-
-static int _load_write(void) {
-    int new_lib = open(FNAME, O_CREAT | O_WRONLY);
-    write(new_lib, libPrinter_dylib, sizeof(libPrinter_dylib));
-    close(new_lib);
-    return _load_and_run(FNAME);
 }
 
 static void _handle_error(const char* msg) {
